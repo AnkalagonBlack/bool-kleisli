@@ -2,7 +2,8 @@ module Data.Bool.Kleisli (
 allM,
 anyM,
 orM,
-andM
+andM,
+kleisify
 ) where
 
 import Control.Monad
@@ -27,3 +28,4 @@ andM m1 m2 = allM [m1, m2]
 orM :: (Functor m, Monad m) => (a -> m Bool) -> (a -> m Bool) -> a -> m Bool
 orM m1 m2 = anyM [m1, m2]
 
+kleisify f = return . ($) f
