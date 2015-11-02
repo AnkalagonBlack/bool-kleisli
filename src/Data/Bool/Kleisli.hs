@@ -3,7 +3,8 @@ allM,
 anyM,
 orM,
 andM,
-kleisify
+kleisify,
+(<.>)
 ) where
 
 import Control.Monad
@@ -13,6 +14,13 @@ import Data.Maybe
 boolToMaybe :: Monad m => Bool -> m (Maybe ())
 boolToMaybe True = return $ Just ()
 boolToMaybe False  = return Nothing
+
+infixr 4 <.>
+
+(<.>) :: (Applicative m) => (b -> c) -> (a -> m b) -> (a -> m c)
+(<.>) f g = (<*>) (pure f) . ($) g
+
+kleisify f = return . ($) f
 
 helper bs a f = fmap (f . isJust) . runMaybeT . mapM_ (MaybeT . ($ a) . (<=<) (boolToMaybe . f)) $ bs  
 
@@ -28,4 +36,3 @@ andM m1 m2 = allM [m1, m2]
 orM :: (Functor m, Monad m) => (a -> m Bool) -> (a -> m Bool) -> a -> m Bool
 orM m1 m2 = anyM [m1, m2]
 
-kleisify f = return . ($) f
